@@ -1,0 +1,18 @@
+schema_version = "1.0.0"
+
+id = "softimage_workflow_kit"
+version = "0.0.1"
+name = "Softimage Workflow Kit"
+tagline = "Work in Blender the way you worked in Softimage"
+maintainer = "k3nny-Wood"
+type = "add-on"
+
+website = ""
+
+tags = ["User Interface", "Modeling", "Animation"]
+
+blender_version_min = "4.5.0"
+
+license = [
+  "SPDX:GPL-3.0-or-later",
+]
