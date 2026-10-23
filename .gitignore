@@ -3,3 +3,8 @@ __pycache__/
 *.zip
 .vscode/
 .idea/
+tests/last_result.txt
+tests/live_result.txt
+tests/live_area.txt
+tests/live_marker.txt
+tests/workspace.png
