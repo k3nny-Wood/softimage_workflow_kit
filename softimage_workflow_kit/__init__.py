@@ -10,13 +10,13 @@ from bpy.props import BoolProperty
 bl_info = {
     "name": "Softimage Workflow Kit",
     "author": "k3nny-Wood",
-    "version": (0, 0, 2),
+    "version": (0, 1, 0),
     "blender": (4, 5, 0),
     "description": "Softimage's workflow on top of Blender",
     "category": "Interface",
 }
 
-from . import keymap, ops, pies, workspace
+from . import canvas, keymap, menus, ops, panel_view, pies, workspace
 
 
 def _use_keys_changed(self, context):
@@ -69,6 +69,7 @@ def _prefs():
 
 def register():
     ops.register()
+    menus.register()
     pies.register()
     workspace.register()
     for cls in _classes:
@@ -84,4 +85,5 @@ def unregister():
         bpy.utils.unregister_class(cls)
     workspace.unregister()
     pies.unregister()
+    menus.unregister()
     ops.unregister()

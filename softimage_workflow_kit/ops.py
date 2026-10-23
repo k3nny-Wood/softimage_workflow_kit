@@ -198,9 +198,157 @@ class SIWK_OT_open_prefs(Operator):
         return {'FINISHED'}
 
 
+class SIWK_OT_key_all(Operator):
+    """Save a key on every keyable channel (location, rotation, scale) of the selected objects"""
+    bl_idname = "siwk.key_all"
+    bl_label = "Key All Keyable"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        n = 0
+        for ob in context.selected_objects:
+            for path in ("location", "rotation_euler" if ob.rotation_mode != 'QUATERNION' else "rotation_quaternion", "scale"):
+                ob.keyframe_insert(data_path=path)
+            n += 1
+        self.report({'INFO'}, "Keyed %d object(s) at frame %d" % (n, context.scene.frame_current))
+        return {'FINISHED'}
+
+
+class SIWK_OT_group(Operator):
+    """Put the selected objects in a new group (a collection)"""
+    bl_idname = "siwk.group"
+    bl_label = "Group"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        objs = list(context.selected_objects)
+        if not objs:
+            self.report({'INFO'}, "Select objects to group first")
+            return {'CANCELLED'}
+        coll = bpy.data.collections.new("Group")
+        context.scene.collection.children.link(coll)
+        for ob in objs:
+            coll.objects.link(ob)
+        return {'FINISHED'}
+
+
+class SIWK_OT_freeze(Operator):
+    """Freeze: bake the modifiers of the selected objects into their geometry"""
+    bl_idname = "siwk.freeze"
+    bl_label = "Freeze"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        n = 0
+        for ob in list(context.selected_objects):
+            if ob.type in {'MESH', 'CURVE', 'SURFACE', 'FONT'} and ob.modifiers:
+                context.view_layer.objects.active = ob
+                bpy.ops.object.convert(target='MESH')
+                n += 1
+        self.report({'INFO'}, "Froze %d object(s)" % n)
+        return {'FINISHED'}
+
+
+class SIWK_OT_set_workspace(Operator):
+    """Switch to a workspace"""
+    bl_idname = "siwk.set_workspace"
+    bl_label = "Workspace"
+
+    name: StringProperty()
+
+    def execute(self, context):
+        ws = bpy.data.workspaces.get(self.name)
+        if ws is None:
+            return {'CANCELLED'}
+        context.window.workspace = ws
+        return {'FINISHED'}
+
+
+class SIWK_OT_set_module(Operator):
+    """Model / Animate / Render / Simulate: the module whose toolbar the left panel shows"""
+    bl_idname = "siwk.set_module"
+    bl_label = "Module"
+
+    module: StringProperty()
+
+    def execute(self, context):
+        from . import canvas
+        for canv in canvas._registry.values():
+            if hasattr(canv, "module"):
+                canv.module = self.module
+        for area in context.window.screen.areas:
+            area.tag_redraw()
+        return {'FINISHED'}
+
+
+class SIWK_OT_set_view_layer(Operator):
+    """Choose the view layer (Softimage's pass)"""
+    bl_idname = "siwk.set_view_layer"
+    bl_label = "Pass"
+
+    name: StringProperty()
+
+    def execute(self, context):
+        vl = context.scene.view_layers.get(self.name)
+        if vl is None:
+            return {'CANCELLED'}
+        context.window.view_layer = vl
+        return {'FINISHED'}
+
+
+class SIWK_OT_scene_search(Operator):
+    """Select the objects whose name contains the text (Softimage's Scene Search)"""
+    bl_idname = "siwk.scene_search"
+    bl_label = "Scene Search"
+
+    text: StringProperty()
+
+    def execute(self, context):
+        text = self.text.strip().lower()
+        if not text:
+            return {'CANCELLED'}
+        hits = [o for o in context.view_layer.objects if text in o.name.lower() and o.visible_get()]
+        if context.mode != 'OBJECT':
+            bpy.ops.object.mode_set(mode='OBJECT')
+        for o in context.view_layer.objects:
+            o.select_set(False)
+        for o in hits:
+            o.select_set(True)
+        if hits:
+            context.view_layer.objects.active = hits[0]
+        self.report({'INFO'}, "%d object(s) match '%s'" % (len(hits), self.text))
+        return {'FINISHED'}
+
+
+class SIWK_OT_run_command(Operator):
+    """Run a command typed on the command line: a Python statement or expression (bpy and the scene objects are available)"""
+    bl_idname = "siwk.run_command"
+    bl_label = "Command"
+
+    text: StringProperty()
+
+    def execute(self, context):
+        text = self.text.strip()
+        if not text:
+            return {'CANCELLED'}
+        scope = {"bpy": bpy, "C": context, "D": bpy.data, "scene": context.scene, "selection": list(context.selected_objects)}
+        try:
+            try:
+                result = eval(compile(text, "<softimage command line>", "eval"), scope)
+                if result is not None:
+                    self.report({'INFO'}, repr(result))
+            except SyntaxError:
+                exec(compile(text, "<softimage command line>", "exec"), scope)
+        except Exception as exc:   # (whatever the user typed: report it and go on)
+            self.report({'ERROR'}, "%s: %s" % (type(exc).__name__, exc))
+            return {'CANCELLED'}
+        return {'FINISHED'}
+
+
 classes = (
     SIWK_OT_nav_hold, SIWK_OT_component_mode, SIWK_OT_shading, SIWK_OT_view_type, SIWK_OT_toggle_grid, SIWK_OT_proportional,
     SIWK_OT_select_all, SIWK_OT_delete, SIWK_OT_duplicate, SIWK_OT_open_prefs,
+    SIWK_OT_key_all, SIWK_OT_group, SIWK_OT_freeze, SIWK_OT_set_workspace, SIWK_OT_set_module, SIWK_OT_set_view_layer, SIWK_OT_scene_search, SIWK_OT_run_command,
 )
 
 

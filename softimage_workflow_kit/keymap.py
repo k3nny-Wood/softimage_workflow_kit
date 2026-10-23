@@ -28,11 +28,17 @@ def _keymap(kc, name, space_type='EMPTY', region_type='WINDOW'):
     return km
 
 
+def _hdr(km):
+    """A left click on a Softimage viewport's header strip (the operator passes any other click through)."""
+    _add(km, "siwk.view_header", 'LEFTMOUSE', 'PRESS')
+
+
 def _nav(km):
     """S + drag: the navigation, in every keymap whose own left / right press (select, context menu) would otherwise win"""
     _add(km, "view3d.rotate", 'LEFTMOUSE', key_modifier='S')
     _add(km, "view3d.move", 'MIDDLEMOUSE', key_modifier='S')
     _add(km, "view3d.dolly", 'RIGHTMOUSE', key_modifier='S')
+    _hdr(km)
 
 
 def register():
@@ -80,6 +86,12 @@ def register():
         _add(km, "wm.call_menu_pie", 'D', name="SIWK_MT_pie_modeling")
     km = _keymap(kc, "Mesh")
     _add(km, "mesh.bevel", 'B', shift=True)
+
+    # the custom-drawn panels: the mouse goes to the panel under it
+    km = _keymap(kc, "Spreadsheet Generic", 'SPREADSHEET')
+    _add(km, "siwk.canvas_event", 'MOUSEMOVE', 'ANY')
+    _add(km, "siwk.canvas_event", 'LEFTMOUSE', 'PRESS')
+    _add(km, "siwk.canvas_event", 'LEFTMOUSE', 'RELEASE')
 
     # the tools' own keymaps take the left press (select) before the modes' do: S + drag has to be in them as well
     for dkm in bpy.context.window_manager.keyconfigs.default.keymaps:

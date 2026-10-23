@@ -1,14 +1,25 @@
 # Softimage Workflow Kit for Blender
 
-Work in Blender the way you worked in Softimage: its keys and navigation, its four-view layout and its pie menus, on top of Blender's own tools.
+Work in Blender the way you worked in Softimage: its layout and panels, its keys and navigation, its menus and its pie menus, on top of Blender's own tools.
 
-> **Status: early (0.0.2).** The first milestone is in: keys, hold-S navigation, the Softimage workspace and five pie menus. Menus, panels and the Softimage concepts (groups, Explorer, property page, constraint compensation) come next.
+> **Status: 0.1.0, personal use.** The Softimage workspace is in and working: menu bar, module toolbar, four viewports with Softimage's header strips, the MCP, the timeline and the bottom bar. Many buttons call the closest Blender operation; Softimage features Blender has no equivalent for are greyed out.
 
-## What it does now
+## The Softimage workspace
 
-**Navigation.** Hold **S** and drag: left = orbit, middle = pan, right = dolly. S alone does nothing (Blender's own S, scale, is swallowed).
+Preferences > Add-ons > Softimage Workflow Kit > **Create Softimage Workspace** builds a "Softimage" workspace laid out like Softimage's default layout (`Application/layouts/default.xsily`):
 
-**Keys** (Object mode and the edit modes):
+- **Menu bar:** File, Edit, View, Display, Window, Help, then Model, Animate, Render, ICE and Simulate; the construction-mode and pass choosers; Scene Search (type a name, Enter selects).
+- **Toolbar panel (left):** the module chooser (Model / Animate / Render / Simulate) and the groups of buttons (Get, Create, Deform, Actions, Tools ...). Each button opens a flyout of Blender operations.
+- **Four viewports:** Top, User, Front, Right in a 2 x 2 grid, with Softimage's header strip over each (viewport letter, view-type dropdown, display-type dropdown, maximize) and the mid-grey background.
+- **MCP (right):** Select (tool, Group, Center, Object / Point / Edge / Polygon, the name box), Transform (scale, rotation and translation boxes you can type into, the S / R / T tools, locks, Global / Local / View and the other reference frames, COG / Prop / Sym), Snap, Constrain and Edit.
+- **Timeline:** the current-frame box, the ruler (click or drag to scrub), the range boxes.
+- **Bottom bar:** the command line (type a Python statement, Enter runs it; `bpy`, `scene`, `D`, `C` and `selection` are available), the playback buttons, Auto key, the key button, Key All Keyable and the status line.
+
+The panels are drawn by the kit itself (Blender's own widgets cannot look like Softimage's) into dedicated areas, with the mouse routed to them by the kit. Colours, sizes and positions were measured from Softimage 2015 SP2 at 100 % scale. Softimage's own icons and bitmaps are not used or included.
+
+## Keys and navigation
+
+**Navigation.** Hold **S** and drag: left = orbit, middle = pan, right = dolly. S alone does nothing.
 
 | Key | Does |
 |---|---|
@@ -25,37 +36,32 @@ Work in Blender the way you worked in Softimage: its keys and navigation, its fo
 | Delete | delete the objects or the points / edges / polygons |
 | Shift+B | bevel (edit mode) |
 
-**Pie menus** (hold the key, flick toward a choice, release; or tap and click):
+**Pie menus** (hold the key, flick toward a choice, release; or tap and click): **Z** display, **\`** view, **Tab** mode, **.** transform, **D** modeling (it follows the selection: objects, polygons, edges, vertices, or the geometry tools when nothing is selected).
 
-| Key | Pie |
-|---|---|
-| Z | Display: wireframe, shaded, textured, realtime, constant, rendered, wire on shaded, grid |
-| \` | View: front, right, user, top, frame all, frame selection, maximize, isometric |
-| Tab | Mode: vertex, edge, polygon, object and the select / move / rotate / scale tools |
-| . | Transform: view, local, parent, global, soft selection, normal, invert selection, unselect all |
-| D | Modeling: follows the context. Objects: duplicate, merge, delete, freeze ... Polygons: bevel, extrude, inset, bridge ... Edges and vertices have their own sets. With nothing selected in edit mode: the geometry tools (knife, loop cut, poly build ...) |
-
-**Workspace.** Preferences > Add-ons > Softimage Workflow Kit > *Create Softimage Workspace* adds a "Softimage" workspace with Top, User, Front and Right views in a 2 x 2 layout: wireframe in the orthographic views, shaded in the User view. *Apply Softimage Navigation Preferences* sets turntable orbit and horizontal dolly (it changes your own preferences, so it is a button and not automatic).
-
-**One switch back.** Untick "Softimage keys and pie menus" in the add-on preferences, or disable the add-on, and Blender's own keys are back. The kit only adds items to Blender's add-on key configuration; it never edits your keymap, theme or preferences on its own.
+**One switch back.** Untick "Softimage keys and pie menus" in the add-on preferences, or disable the add-on, and Blender's own keys are back. The kit only adds to Blender's add-on key configuration; it never edits your keymap, theme or preferences on its own (the navigation preferences are a button).
 
 ## What it will not be
 
-Blender is not Softimage. It has no construction-history operator stack, no clusters and no Softimage object model, and a Python add-on cannot redraw the interface from scratch. The kit gets Blender close to Softimage's feel, not identical to it. Where Softimage has something Blender cannot do, the entry will be greyed out with an explanation.
+Blender is not Softimage. It has no construction-history operator stack, no clusters and no Softimage object model, so "Construction Mode", "CnsComp", "ChldComp" and "Immed" are shown greyed out, and Explore / Scene / Selection / Clusters open menus of the closest Blender equivalents. Menus open as Blender menus, not Softimage's own popup style.
+
+## Try it without installing
+
+`powershell -File launch_softimage.ps1` starts Blender (5.1 by default; `-Blender <path>` picks another, `-Factory` uses factory settings) with the kit loaded from this folder and the Softimage workspace built a couple of seconds later (its tab is called **Softimage**). Nothing is installed or saved to your preferences.
 
 ## Install (development)
 
 1. Copy or link the `softimage_workflow_kit` folder into Blender's add-ons folder, or build a zip with `blender --command extension build --source-dir softimage_workflow_kit`.
-2. Enable **Softimage Workflow Kit** under Edit > Preferences > Add-ons.
+2. Enable **Softimage Workflow Kit** under Edit > Preferences > Add-ons, then click *Create Softimage Workspace*.
 
-Tested on Blender 5.0 and 5.1. The manifest asks for 4.5 LTS or newer; 4.5 itself is not tested yet.
+Tested on Blender 5.0 and 5.1. The manifest asks for 4.5 LTS or newer; 4.5 itself is not tested yet. Fonts: Tahoma (from Windows) when present.
 
 ## Tests
 
-Both run a real Blender and need no extra tools:
+All three run a real Blender and need no extra tools:
 
-- `blender --factory-startup --python tests/blender_smoke.py`: registers the kit, checks the keymap, calls the operators, builds the workspace, unregisters and checks nothing is left behind. Writes `tests/last_result.txt`.
-- `powershell -File tests\live_nav.ps1` (Windows): starts Blender and sends real key and mouse events to check S + left / middle / right drag navigation. Writes `tests/live_result.txt`.
+- `blender --factory-startup --python tests/blender_smoke.py`: registers the kit, checks the keymap, the operators, the workspace and the panels, activates the panels' buttons and typed values, runs a command-line statement, draws every menu, unregisters and checks nothing is left behind. Writes `tests/last_result.txt`.
+- `powershell -File tests\live_nav.ps1` (Windows): sends real key and mouse events to check S + left / middle / right drag navigation.
+- `powershell -File tests\live_panels.ps1` (Windows): builds the workspace and clicks panel buttons and the timeline ruler with the real mouse.
 
 ## Licence and credits
 
