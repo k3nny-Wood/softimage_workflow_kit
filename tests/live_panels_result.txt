@@ -1,6 +1,0 @@
-PASS a click on the MCP's Local button sets the Local orientation (now LOCAL)
-PASS a click on Auto toggles auto-key
-PASS a click on Prop toggles soft selection
-PASS a click on the middle of the timeline ruler moves the frame there (126)
-LIVE RESULT: OK
-DONE
